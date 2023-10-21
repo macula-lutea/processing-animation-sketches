@@ -8,7 +8,7 @@ PImage img;
 void setup() {
   size(1052, 562);
   img = loadImage("wall.png");
-  img.filter(GRAY);
+  //img.filter(GRAY);
   image(img, 0, 0);
 }
 
@@ -50,9 +50,10 @@ void draw() {
       float green = green(p);
       float blue = blue(p);
 
-      int nR = round(1 * red/255) * (255/1);
-      int nG = round(1 * green/255) * (255/1);
-      int nB = round(1 * blue/255) * (255/1);
+      int factor = 8;
+      int nR = round(factor * red/255) * (255/factor);
+      int nG = round(factor * green/255) * (255/factor);
+      int nB = round(factor * blue/255) * (255/factor);
       img.pixels[i] = color(nR, nG, nB);
 
       float errR = red - nR;
