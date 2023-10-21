@@ -1,6 +1,7 @@
 // Code based on The Coding Train exercise #90 - Floyd-Steinberg Dithering
 // by Daniel Shiffman
 // https://thecodingtrain.com/challenges/90-dithering
+// Images used are my own
 
 PImage img;
 
@@ -27,6 +28,16 @@ int index(int x, int y, int w) {
 //        pixels[x    ][y + 1] := pixels[x    ][y + 1] + quant_error × 5 / 16
 //        pixels[x + 1][y + 1] := pixels[x + 1][y + 1] + quant_error × 1 / 16
 
+ void dither(int index, float errR, float errG, float errB, float distributionAmount) {
+      color c = img.pixels[index];
+      float r = red(c);
+      float g = green(c);
+      float b = blue(c);
+      r = r + errR * distributionAmount;
+      g = g + errG * distributionAmount;
+      b = b + errB * distributionAmount;
+      img.pixels[index] = color(r, g, b);
+ }
 
 void draw() {
   img.loadPixels();
@@ -48,47 +59,13 @@ void draw() {
       float errG = green - nG;
       float errB = blue - nB;
 
-      int index = index(x+1, y, img.width);
-      color c = img.pixels[index];
-      float r = red(c);
-      float g = green(c);
-      float b = blue(c);
-      r = r + errR * 7.0/16.0;
-      g = g + errG * 7.0/16.0;
-      b = b + errB * 7.0/16.0;
-      img.pixels[index] = color(r, g, b);
-
-      index = index(x-1, y+1, img.width);
-      c = img.pixels[index];
-      r = red(c);
-      g = green(c);
-      b = blue(c);
-      r = r + errR * 3.0/16.0;
-      g = g + errG * 3.0/16.0;
-      b = b + errB * 3.0/16.0;
-      img.pixels[index] = color(r, g, b);
-
-      index = index(x, y+1, img.width);
-      c = img.pixels[index];
-      r = red(c);
-      g = green(c);
-      b = blue(c);
-      r = r + errR * 5.0/16.0;
-      g = g + errG * 5.0/16.0;
-      b = b + errB * 5.0/16.0;
-      img.pixels[index] = color(r, g, b);
-
-      index = index(x+1, y+1, img.width);
-      c = img.pixels[index];
-      r = red(c);
-      g = green(c);
-      b = blue(c);
-      r = r + errR * 1.0/16.0;
-      g = g + errG * 1.0/16.0;
-      b = b + errB * 1.0/16.0;
-      img.pixels[index] = color(r, g, b);
+      dither(index(x+1, y, img.width), errR, errG, errB, 7.0/16.0);
+      dither(index(x-1, y+1, img.width), errR, errG, errB, 3.0/16.0);
+      dither(index(x, y+1, img.width), errR, errG, errB, 5.0/16.0);
+      dither(index(x+1, y+1, img.width), errR, errG, errB, 1.0/16.0);
     }
   }
+
   img.updatePixels();
   image(img,526, 0);
 }
