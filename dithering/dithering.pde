@@ -7,26 +7,86 @@ PImage img;
 void setup() {
   size(1052, 562);
   img = loadImage("wall.png");
+  img.filter(GRAY);
   image(img, 0, 0);
 }
+
+int index(int x, int y, int w) {
+  return x + y * w;
+}
+
+// Pseudocode from https://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering
+//for each y from top to bottom do
+//    for each x from left to right do
+//        oldpixel := pixels[x][y]
+//        newpixel := find_closest_palette_color(oldpixel)
+//        pixels[x][y] := newpixel
+//        quant_error := oldpixel - newpixel
+//        pixels[x + 1][y    ] := pixels[x + 1][y    ] + quant_error × 7 / 16
+//        pixels[x - 1][y + 1] := pixels[x - 1][y + 1] + quant_error × 3 / 16
+//        pixels[x    ][y + 1] := pixels[x    ][y + 1] + quant_error × 5 / 16
+//        pixels[x + 1][y + 1] := pixels[x + 1][y + 1] + quant_error × 1 / 16
 
 
 void draw() {
   img.loadPixels();
-  for (int x = 0; x < img.width; x++) {
-    for (int y = 0; y < img.height; y++) {
-      int i = x + y * img.width;
+  for (int y = 0; y < img.height-1; y++) {
+    for (int x = 1; x < img.width-1; x++) {
+      int i = index(x, y, img.width);
       color p = img.pixels[i];
 
-      float r = red(p);
-      float g = green(p);
-      float b = blue(p);
+      float red = red(p);
+      float green = green(p);
+      float blue = blue(p);
 
-      int nr = round(3 * r/255) * (255/3);
-      int ng = round(3 * g/255) * (255/3);
-      int nb = round(3 * b/255) * (255/3);
+      int nR = round(1 * red/255) * (255/1);
+      int nG = round(1 * green/255) * (255/1);
+      int nB = round(1 * blue/255) * (255/1);
+      img.pixels[i] = color(nR, nG, nB);
 
-      img.pixels[i] = color(nr, ng, nb);
+      float errR = red - nR;
+      float errG = green - nG;
+      float errB = blue - nB;
+
+      int index = index(x+1, y, img.width);
+      color c = img.pixels[index];
+      float r = red(c);
+      float g = green(c);
+      float b = blue(c);
+      r = r + errR * 7.0/16.0;
+      g = g + errG * 7.0/16.0;
+      b = b + errB * 7.0/16.0;
+      img.pixels[index] = color(r, g, b);
+
+      index = index(x-1, y+1, img.width);
+      c = img.pixels[index];
+      r = red(c);
+      g = green(c);
+      b = blue(c);
+      r = r + errR * 3.0/16.0;
+      g = g + errG * 3.0/16.0;
+      b = b + errB * 3.0/16.0;
+      img.pixels[index] = color(r, g, b);
+
+      index = index(x, y+1, img.width);
+      c = img.pixels[index];
+      r = red(c);
+      g = green(c);
+      b = blue(c);
+      r = r + errR * 5.0/16.0;
+      g = g + errG * 5.0/16.0;
+      b = b + errB * 5.0/16.0;
+      img.pixels[index] = color(r, g, b);
+
+      index = index(x+1, y+1, img.width);
+      c = img.pixels[index];
+      r = red(c);
+      g = green(c);
+      b = blue(c);
+      r = r + errR * 1.0/16.0;
+      g = g + errG * 1.0/16.0;
+      b = b + errB * 1.0/16.0;
+      img.pixels[index] = color(r, g, b);
     }
   }
   img.updatePixels();
