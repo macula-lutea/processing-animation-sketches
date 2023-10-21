@@ -28,7 +28,7 @@ int index(int x, int y, int w) {
 //        pixels[x    ][y + 1] := pixels[x    ][y + 1] + quant_error × 5 / 16
 //        pixels[x + 1][y + 1] := pixels[x + 1][y + 1] + quant_error × 1 / 16
 
- void dither(int index, float errR, float errG, float errB, float distributionAmount) {
+ void diffuseError(int index, float errR, float errG, float errB, float distributionAmount) {
       color c = img.pixels[index];
       float r = red(c);
       float g = green(c);
@@ -60,10 +60,10 @@ void draw() {
       float errG = green - nG;
       float errB = blue - nB;
 
-      dither(index(x+1, y, img.width), errR, errG, errB, 7.0/16.0);
-      dither(index(x-1, y+1, img.width), errR, errG, errB, 3.0/16.0);
-      dither(index(x, y+1, img.width), errR, errG, errB, 5.0/16.0);
-      dither(index(x+1, y+1, img.width), errR, errG, errB, 1.0/16.0);
+      diffuseError(index(x+1, y, img.width), errR, errG, errB, 7.0/16.0);
+      diffuseError(index(x-1, y+1, img.width), errR, errG, errB, 3.0/16.0);
+      diffuseError(index(x, y+1, img.width), errR, errG, errB, 5.0/16.0);
+      diffuseError(index(x+1, y+1, img.width), errR, errG, errB, 1.0/16.0);
     }
   }
 
